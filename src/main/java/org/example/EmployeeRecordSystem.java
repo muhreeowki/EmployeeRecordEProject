@@ -1,13 +1,16 @@
 package org.example;
 
 import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.*;
 
+/**
+ * Employee class represents an individual employee record in the system.
+ * Implements Serializable to support file-based storage of employee records.
+ */
 class Employee implements Serializable {
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L; // Version ID for serialization compatibility
     private int empNumber;
     private String firstName;
     private String lastName;
@@ -19,7 +22,20 @@ class Employee implements Serializable {
     private String city;
     private String phoneNumber;
 
-    // Constructor
+    /**
+     * Constructs a new Employee with the specified details.
+     *
+     * @param empNumber      Unique employee identification number
+     * @param firstName      Employee's first name
+     * @param lastName       Employee's last name
+     * @param age           Employee's age (must be between 18 and 65)
+     * @param basicSalary    Employee's basic salary (must be positive)
+     * @param department     Employee's department
+     * @param dateOfJoining  Employee's joining date (format: DD-MMM-YYYY)
+     * @param address       Employee's address
+     * @param city          Employee's city
+     * @param phoneNumber   Employee's phone number (10 digits)
+     */
     public Employee(int empNumber, String firstName, String lastName, int age, double basicSalary, String department,
                     String dateOfJoining, String address, String city, String phoneNumber) {
         this.empNumber = empNumber;
@@ -56,6 +72,10 @@ class Employee implements Serializable {
     public void setCity(String city) { this.city = city; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
+    /**
+     * Returns a formatted string representation of the employee record.
+     * @return Formatted string containing all employee details
+     */
     @Override
     public String toString() {
         return String.format("%-10d %-15s %-15s %-5d %-10.2f %-15s %-15s %-20s %-15s %-15s",
@@ -63,11 +83,20 @@ class Employee implements Serializable {
     }
 }
 
+/**
+ * EmployeeRecordSystem is the main class that manages employee records.
+ * It provides functionality for adding, deleting, modifying, and searching employee records.
+ * The system persists data to a file and supports various validation rules for employee data.
+ */
 public class EmployeeRecordSystem {
     private static final String FILE_NAME = "employees.txt";
     private static List<Employee> employees = new ArrayList<>();
     private static int nextEmpNumber = 1;
 
+    /**
+     * Main method that runs the employee record system.
+     * Provides a menu-driven interface for user interaction.
+     */
     public static void main(String[] args) {
         loadEmployees();
         Scanner scanner = new Scanner(System.in);
@@ -85,24 +114,12 @@ public class EmployeeRecordSystem {
             scanner.nextLine(); // Consume newline
 
             switch (choice) {
-                case 1:
-                    addEmployee(scanner);
-                    break;
-                case 2:
-                    deleteEmployee(scanner);
-                    break;
-                case 3:
-                    modifyEmployee(scanner);
-                    break;
-                case 4:
-                    searchEmployee(scanner);
-                    break;
-                case 5:
-                    displayAllRecords();
-                    break;
-                case 6:
-                    countRecords();
-                    break;
+                case 1: addEmployee(scanner); break;
+                case 2: deleteEmployee(scanner); break;
+                case 3: modifyEmployee(scanner); break;
+                case 4: searchEmployee(scanner); break;
+                case 5: displayAllRecords(); break;
+                case 6: countRecords(); break;
                 case 7:
                     saveEmployees();
                     System.out.println("Exiting...");
@@ -113,10 +130,14 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Loads employee records from the file system.
+     * Creates a new file if none exists.
+     */
     private static void loadEmployees() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             employees = (List<Employee>) ois.readObject();
-            nextEmpNumber = employees.isEmpty() ? 1 : employees.get(employees.size() - 1).getEmpNumber() + 1;
+            nextEmpNumber = employees.isEmpty() ? 1 : employees.getLast().getEmpNumber() + 1;
         } catch (FileNotFoundException e) {
             System.out.println("No existing records found. Starting with a new file.");
         } catch (IOException | ClassNotFoundException e) {
@@ -124,6 +145,9 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Saves employee records to the file system.
+     */
     private static void saveEmployees() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
             oos.writeObject(employees);
@@ -132,6 +156,12 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Adds a new employee to the system.
+     * Validates all input fields before adding the employee.
+     *
+     * @param scanner Scanner object for reading user input
+     */
     private static void addEmployee(Scanner scanner) {
         System.out.print("Enter First Name: ");
         String firstName = scanner.nextLine();
@@ -163,6 +193,11 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Validates employee input data according to business rules.
+     *
+     * @return true if all inputs are valid, false otherwise
+     */
     private static boolean validateInput(String firstName, String lastName, int age, double basicSalary, String department,
                                          String dateOfJoining, String address, String city, String phoneNumber) {
         if (firstName.isEmpty() || lastName.isEmpty() || department.isEmpty() || address.isEmpty() || city.isEmpty() || phoneNumber.isEmpty()) {
@@ -188,6 +223,11 @@ public class EmployeeRecordSystem {
         return true;
     }
 
+    /**
+     * Deletes an employee record based on employee number.
+     *
+     * @param scanner Scanner object for reading user input
+     */
     private static void deleteEmployee(Scanner scanner) {
         System.out.print("Enter Employee Number to delete: ");
         int empNumber = scanner.nextInt();
@@ -201,6 +241,12 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Modifies an existing employee record.
+     * Only updates fields that are provided with new values.
+     *
+     * @param scanner Scanner object for reading user input
+     */
     private static void modifyEmployee(Scanner scanner) {
         System.out.print("Enter Employee Number to modify: ");
         int empNumber = scanner.nextInt();
@@ -279,6 +325,12 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Searches for employees based on first name, last name, and/or department.
+     * Search is case-insensitive and supports partial matching.
+     *
+     * @param scanner Scanner object for reading user input
+     */
     private static void searchEmployee(Scanner scanner) {
         System.out.print("Enter First Name (or leave blank): ");
         String firstName = scanner.nextLine();
@@ -302,6 +354,9 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Displays all employee records in a formatted table.
+     */
     private static void displayAllRecords() {
         if (employees.isEmpty()) {
             System.out.println("No records found.");
@@ -311,6 +366,11 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Displays a formatted table of employee records.
+     *
+     * @param records List of employee records to display
+     */
     private static void displayRecords(List<Employee> records) {
         System.out.printf("%-10s %-15s %-15s %-5s %-10s %-15s %-15s %-20s %-15s %-15s\n",
                 "Emp No", "First Name", "Last Name", "Age", "Salary", "Department", "DOJ", "Address", "City", "Phone");
@@ -319,10 +379,19 @@ public class EmployeeRecordSystem {
         }
     }
 
+    /**
+     * Counts and displays the total number of employee records.
+     */
     private static void countRecords() {
         System.out.println("Total number of records: " + employees.size());
     }
 
+    /**
+     * Finds an employee by their employee number.
+     *
+     * @param empNumber Employee number to search for
+     * @return Employee object if found, null otherwise
+     */
     private static Employee findEmployeeByNumber(int empNumber) {
         for (Employee emp : employees) {
             if (emp.getEmpNumber() == empNumber) {
