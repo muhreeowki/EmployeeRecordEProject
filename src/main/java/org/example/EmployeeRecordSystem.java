@@ -201,23 +201,23 @@ public class EmployeeRecordSystem {
     private static boolean validateInput(String firstName, String lastName, int age, double basicSalary, String department,
                                          String dateOfJoining, String address, String city, String phoneNumber) {
         if (firstName.isEmpty() || lastName.isEmpty() || department.isEmpty() || address.isEmpty() || city.isEmpty() || phoneNumber.isEmpty()) {
-            System.out.print("Found Empty Fields.");
+            System.out.println("Found Empty Fields.");
             return false;
         }
         if (age < 18 || age > 65) {
-            System.out.print("Invalid Age.");
+            System.out.println("Invalid Age.");
             return false;
         }
         if (basicSalary < 0) {
-            System.out.print("Salary must be greater than 0.");
+            System.out.println("Salary must be greater than 0.");
             return false;
         }
         if (!Pattern.matches("\\d{2}-[A-Za-z]{3}-\\d{4}", dateOfJoining)) {
-            System.out.print("Invalid Date.");
+            System.out.println("Invalid Date.");
             return false;
         }
         if (!Pattern.matches("\\d{10}", phoneNumber)) {
-            System.out.print("Invalid Phone Number.");
+            System.out.println("Invalid Phone Number.");
             return false;
         }
         return true;
